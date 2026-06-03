@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
   })
 
   if (!tokenRes.ok) {
-    return NextResponse.redirect(`${APP_URL}/login?error=token_failed`)
+    return NextResponse.redirect(`${baseUrl}/login?error=token_failed`)
   }
 
   const tokenData = await tokenRes.json()
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
   })
 
   if (!profileRes.ok) {
-    return NextResponse.redirect(`${APP_URL}/login?error=profile_failed`)
+    return NextResponse.redirect(`${baseUrl}/login?error=profile_failed`)
   }
 
   const profile = await profileRes.json()
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
       .single()
 
     if (!newUser) {
-      return NextResponse.redirect(`${APP_URL}/login?error=db_error`)
+      return NextResponse.redirect(`${baseUrl}/login?error=db_error`)
     }
     userId = newUser.id
   }
