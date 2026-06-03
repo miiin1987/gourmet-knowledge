@@ -3,8 +3,6 @@ import { createServiceClient } from '@/lib/supabase/server'
 
 const LINE_LOGIN_CHANNEL_ID = process.env.LINE_LOGIN_CHANNEL_ID!
 const LINE_LOGIN_CHANNEL_SECRET = process.env.LINE_LOGIN_CHANNEL_SECRET!
-const CALLBACK_URL = process.env.LINE_LOGIN_CALLBACK_URL!
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL!
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -12,8 +10,12 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get('state')
   const storedState = req.cookies.get('line_state')?.value
 
+  // リクエストのホストからURLを自動生成
+  const baseUrl = `${req.nextUrl.protocol}//${req.nextUrl.host}`
+  const callbackUrl = `${baseUrl}/api/auth/line/callback`
+
   if (!code || state !== storedState) {
-    return NextResponse.redirect(`${APP_URL}/login?error=invalid_state`)
+    return NextResponse.redirect(`${baseUrl}/login?error=invalid_state`)
   }
 
   // LINEアクセストークンを取得
@@ -23,7 +25,7 @@ export async function GET(req: NextRequest) {
     body: new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      redirect_uri: CALLBACK_URL,
+      redirect_uri: callbackUrl,
       client_id: LINE_LOGIN_CHANNEL_ID,
       client_secret: LINE_LOGIN_CHANNEL_SECRET,
     }),
@@ -85,7 +87,7 @@ export async function GET(req: NextRequest) {
   }
 
   // セッションCookieを設定
-  const response = NextResponse.redirect(`${APP_URL}/`)
+  const response = NextResponse.redirect(`${baseUrl}/`)
   response.cookies.set('user_id', userId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
