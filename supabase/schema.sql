@@ -69,7 +69,6 @@ create index spots_rating_idx on spots(user_id, rating desc nulls last);
 create index spots_created_at_idx on spots(user_id, created_at desc);
 
 -- RLS（Row Level Security）は無効にしてサービスロールキーで操作
--- ※ 必要に応じて有効化してください
 alter table users disable row level security;
 alter table spots disable row level security;
 alter table line_conversations disable row level security;
